@@ -54,16 +54,83 @@
  */
 export function createThaliDescription(thali) {
   // Your code here
+  if (
+    typeof thali !== "object" ||
+    thali === null ||
+    typeof thali.name !== "string" ||
+    !Array.isArray(thali.items) ||
+    typeof thali.price !== "number" ||
+    typeof thali.isVeg !== "boolean"
+  )
+    return "";
+
+  let newName = thali.name.toUpperCase();
+  let newItems = thali.items.join(", ");
+  let newPrice = thali.price.toFixed(2);
+  let type = thali.isVeg ? "Veg" : "Non-Veg";
+
+  return `${newName} (${type}) - Items: ${newItems} - Rs.${newPrice}`;
 }
 
 export function getThaliStats(thalis) {
   // Your code here
+  if (!Array.isArray(thalis) || thalis.length === 0) return null;
+
+  let vegCount = thalis.filter((t) => t.isVeg).length;
+  let nonVegCount = thalis.filter((t) => !t.isVeg).length;
+
+  let totalPrice = thalis.reduce((sum, t) => sum + t.price, 0);
+  let avgPrice = (totalPrice / thalis.length).toFixed(2);
+
+  let prices = thalis.map((t) => t.price);
+  let cheapest = Math.min(...prices);
+  let costliest = Math.max(...prices);
+
+  let names = thalis.map((t) => t.name);
+
+  return {
+    totalThalis: thalis.length,
+    vegCount,
+    nonVegCount,
+    avgPrice,
+    cheapest,
+    costliest,
+    names,
+  };
 }
 
 export function searchThaliMenu(thalis, query) {
   // Your code here
+if (!Array.isArray(thalis) || typeof query !== "string") return [];
+
+let q = query.toLowerCase();
+
+return thalis.filter(t => {
+  let nameMatch = t.name.toLowerCase().includes(q);
+  let itemMatch = t.items.some(item => item.toLowerCase().includes(q));
+  return nameMatch || itemMatch;
+});
+
 }
 
 export function generateThaliReceipt(customerName, thalis) {
   // Your code here
+if (typeof customerName !== "string" || !Array.isArray(thalis) || thalis.length === 0) return "";
+
+let upperName = customerName.toUpperCase();
+
+let lineItems = thalis
+  .map(t => `- ${t.name} x Rs.${t.price}`)
+  .join("\n");
+
+let total = thalis.reduce((sum, t) => sum + t.price, 0);
+
+return `THALI RECEIPT
+---
+Customer: ${upperName}
+${lineItems}
+---
+Total: Rs.${total}
+Items: ${thalis.length}`;
+
 }
